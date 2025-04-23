@@ -39,7 +39,7 @@ class _SortScreenState extends State<SortScreen> {
                       Navigator.pop(context); // Ferme le BottomSheet sans sélection
                     },
                     icon: const Icon(
-                      Icons.arrow_back_ios, // Flèche de retour (vers la gauche)
+                      Icons.arrow_back, // Flèche de retour (vers la gauche)
                       color: Colors.grey,
                       size: 20,
                     ),
@@ -88,14 +88,8 @@ class _SortScreenState extends State<SortScreen> {
                         child: Container(
                           height: 1, // Hauteur de la ligne
                           decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3), // Faible opacité
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2), // Ombre légère
-                                blurRadius: 4, // Flou de l'ombre
-                                offset: const Offset(0, 2), // Décalage de l'ombre
-                              ),
-                            ],
+                            color: Colors.grey.withOpacity(0.1), // Faible opacité
+                          
                           ),
                         ),
                       ),

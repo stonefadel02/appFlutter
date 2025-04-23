@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                   'Content de vous revoir',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.darkBlue,
                   ),
@@ -64,10 +64,10 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue,
+                    color: AppColors.grayColor,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 TextButton(
                   onPressed: () {
                     // Naviguer vers la page d'inscription
@@ -86,43 +86,56 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 10),
 
                 // Champ Nom d'utilisateur ou Email avec icône conditionnelle
                 TextField(
-                  controller: _emailController, // Ajoute le contrôleur
+                  controller: _emailController,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: AppColors.grayColor.withOpacity(0.1),
+                    fillColor: AppColors.grayColor.withOpacity(
+                      0.05,
+                    ), // très léger fond gris
                     labelText: "Nom d'utilisateur ou Email",
                     labelStyle: TextStyle(color: AppColors.grayColor),
-                    border: InputBorder.none,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(
+                          0.2,
+                        ), // très légère bordure
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.primaryRed),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(
+                          0.4,
+                        ), // un peu plus visible au focus
+                        width: 1.5,
+                      ),
                     ),
                     suffixIcon:
                         _emailController.text.isNotEmpty
                             ? Icon(
-                              Icons.check_circle, // Icône de validation (coche)
-                              color:
-                                  AppColors
-                                      .grayColor, // Même couleur que le label
+                              Icons.check_circle,
+                              color: AppColors.grayColor,
                             )
-                            : null, // Aucune icône si le champ est vide
+                            : null,
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
+
                 const SizedBox(height: 16),
 
                 // Champ Mot de passe avec icône œil
                 TextField(
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: AppColors.grayColor.withOpacity(0.1),
+                    fillColor: AppColors.grayColor.withOpacity(0.05),
                     labelText: 'Mot de Passe',
                     labelStyle: TextStyle(color: AppColors.grayColor),
                     border: OutlineInputBorder(
@@ -130,10 +143,16 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.2),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.primaryRed),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.4),
+                        width: 1.5,
+                      ),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -149,61 +168,14 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   obscureText: _obscureText,
                 ),
+
                 const SizedBox(height: 16),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _rememberMe,
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value ?? false;
-                            });
-                          },
-                          activeColor: AppColors.primaryRed,
-                        ),
-                        const Text(
-                          'Me rappeler',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ResetPassword(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                      child: Text(
-                        'Mot de passe oublié ?',
-                        style: TextStyle(
-                          color: AppColors.primaryRed,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
                 // Bouton "Se connecter"
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const NavBar(),
-                      ),
+                      MaterialPageRoute(builder: (context) => const NavBar()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -237,16 +209,84 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24),
 
-                const Text(
-                  'Ou',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Checkbox(
+                          shape: const CircleBorder(),
+                          value: _rememberMe,
+                          onChanged: (value) {
+                            setState(() {
+                              _rememberMe = value ?? false;
+                            });
+                          },
+                          activeColor: Colors.black,
+                        ),
+                        const Text(
+                          'Me rappeler',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ResetPassword(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                      child: Text(
+                        'Mot de passe oublié ?',
+                        style: TextStyle(
+                          color: AppColors.primaryRed,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: AppColors.grayColor.withOpacity(
+                          0.3,
+                        ), // même couleur que le texte mais atténuée
+                        thickness: 1,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        'OU',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.grayColor,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: AppColors.grayColor.withOpacity(
+                          0.3,
+                        ), // même couleur que le texte
+                        thickness: 1,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-
                 // Boutons sociaux
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

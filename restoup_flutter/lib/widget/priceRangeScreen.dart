@@ -8,18 +8,18 @@ class PriceRangeScreen extends StatefulWidget {
 }
 
 class _PriceRangeScreenState extends State<PriceRangeScreen> {
-  RangeValues _priceRange = const RangeValues(100, 1500); // Valeurs initiales (100 à 1500 €/kg)
+  RangeValues _priceRange = const RangeValues(100, 1500);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.9, // Hauteur du BottomSheet (90% de l'écran)
+      height: MediaQuery.of(context).size.height * 0.9,
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // S'adapte à la taille du contenu
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Titre et icône de retour
+          // Titre
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -27,76 +27,102 @@ class _PriceRangeScreenState extends State<PriceRangeScreen> {
                 children: [
                   IconButton(
                     onPressed: () {
-                      Navigator.pop(context); // Ferme le BottomSheet sans sélection
+                      Navigator.pop(context);
                     },
                     icon: const Icon(
-                      Icons.arrow_back_ios, // Flèche de retour (vers la gauche)
+                      Icons.arrow_back,
                       color: Colors.grey,
                       size: 20,
                     ),
                   ),
                   const Text(
-                    "Fourchette de prix", // Titre comme dans la maquette
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    "Fourchette de prix",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 100),
 
-          // Valeur maximale affichée au-dessus du slider
-          Center(
-            child: Text(
-              "1500€/kg", // Valeur maximale
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+          // Slider avec bulle au-dessus
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              showValueIndicator: ShowValueIndicator.always,
+              rangeValueIndicatorShape:
+                  const PaddleRangeSliderValueIndicatorShape(),
+              valueIndicatorColor: Colors.red,
+              valueIndicatorTextStyle: const TextStyle(color: Colors.white),
+            ),
+            child: RangeSlider(
+              values: _priceRange,
+              min: 100,
+              max: 1500,
+              divisions: 14,
+              labels: RangeLabels(
+                "${_priceRange.start.round()}€",
+                "${_priceRange.end.round()}€",
               ),
+              activeColor: Colors.yellow,
+              inactiveColor: Colors.grey[300],
+              onChanged: (RangeValues values) {
+                setState(() {
+                  _priceRange = values;
+                });
+              },
             ),
           ),
+
           const SizedBox(height: 10),
 
-          // Slider pour la fourchette de prix
-          RangeSlider(
-            values: _priceRange,
-            min: 100, // Valeur minimale
-            max: 1500, // Valeur maximale
-            divisions: 14, // Nombre de divisions (1500 - 100) / 100 = 14
-            activeColor: Colors.yellow, // Couleur du slider actif (jaune comme dans la maquette)
-            inactiveColor: Colors.grey[300], // Couleur du slider inactif
-            onChanged: (RangeValues values) {
-              setState(() {
-                _priceRange = values; // Met à jour la fourchette de prix
-              });
-            },
-          ),
-
-          // Affichage des valeurs sélectionnées
-          Center(
-            child: Text(
-              "${_priceRange.start.round()}€/kg - ${_priceRange.end.round()}€/kg",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
+          // Affichage des valeurs dans des boîtes
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  "${_priceRange.start.round()}€/kg",
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              const Text(
+                "-",
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  "${_priceRange.end.round()}€/kg",
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                ),
+              ),
+            ],
           ),
 
-          const SizedBox(height: 20),
-
-          // Bouton "Appliquer" (centré et moins long)
+          const Spacer(), // Pousse tout vers le haut, et laisse le bouton en bas
+          // Bouton "Appliquer"
           Center(
             child: SizedBox(
-              width: 200, // Largeur réduite pour le bouton
+              width: 200,
               child: ElevatedButton(
                 onPressed: () {
-                  // Renvoyer la fourchette de prix sous forme de chaîne
                   Navigator.pop(
                     context,
                     "${_priceRange.start.round()}€/kg - ${_priceRange.end.round()}€/kg",
@@ -112,10 +138,7 @@ class _PriceRangeScreenState extends State<PriceRangeScreen> {
                 ),
                 child: const Text(
                   "Appliquer",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

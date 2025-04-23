@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restoup_flutter/color/color.dart';
 
 class BrandScreen extends StatefulWidget {
   const BrandScreen({super.key});
@@ -26,7 +27,8 @@ class _BrandScreenState extends State<BrandScreen> {
   @override
   void initState() {
     super.initState();
-    filteredBrands = brands; // Initialiser la liste filtrée avec toutes les marques
+    filteredBrands =
+        brands; // Initialiser la liste filtrée avec toutes les marques
   }
 
   // Fonction pour filtrer les marques en fonction de la recherche
@@ -35,9 +37,12 @@ class _BrandScreenState extends State<BrandScreen> {
       if (query.isEmpty) {
         filteredBrands = brands;
       } else {
-        filteredBrands = brands
-            .where((brand) => brand.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+        filteredBrands =
+            brands
+                .where(
+                  (brand) => brand.toLowerCase().contains(query.toLowerCase()),
+                )
+                .toList();
       }
     });
   }
@@ -45,7 +50,9 @@ class _BrandScreenState extends State<BrandScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.9, // Hauteur du BottomSheet (90% de l'écran)
+      height:
+          MediaQuery.of(context).size.height *
+          0.9, // Hauteur du BottomSheet (90% de l'écran)
       padding: const EdgeInsets.all(16.0),
       child: Column(
         mainAxisSize: MainAxisSize.min, // S'adapte à la taille du contenu
@@ -59,51 +66,48 @@ class _BrandScreenState extends State<BrandScreen> {
                 children: [
                   IconButton(
                     onPressed: () {
-                      Navigator.pop(context); // Ferme le BottomSheet sans sélection
+                      Navigator.pop(
+                        context,
+                      ); // Ferme le BottomSheet sans sélection
                     },
                     icon: const Icon(
-                      Icons.arrow_back_ios, // Flèche de retour (vers la gauche)
+                      Icons.arrow_back, // Flèche de retour (vers la gauche)
                       color: Colors.grey,
                       size: 20,
                     ),
                   ),
                   const Text(
                     "Marque", // Titre "Marque" comme dans la maquette
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 10), // Réduit l'espacement
-
           // Champ de recherche
           Container(
             decoration: BoxDecoration(
-              color: Colors.grey[200], // Fond gris clair
+              color: AppColors.grayColor.withOpacity(0.1), // Fond gris clair
+
               borderRadius: BorderRadius.circular(10),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
             child: Row(
               children: [
-                const Icon(
-                  Icons.search,
-                  color: Colors.grey,
-                  size: 24,
-                ),
+                const Icon(Icons.search, color: Colors.grey, size: 24),
                 const SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     onChanged: (value) {
-                      filterBrands(value); // Filtrer les marques en fonction de la saisie
+                      filterBrands(
+                        value,
+                      ); // Filtrer les marques en fonction de la saisie
                     },
                     decoration: const InputDecoration(
                       hintText: "Rechercher une marque",
                       hintStyle: TextStyle(
-                        color: Colors.grey,
+                        color: AppColors.grayColor,
                         fontSize: 16,
                       ),
                       border: InputBorder.none,
@@ -114,7 +118,6 @@ class _BrandScreenState extends State<BrandScreen> {
             ),
           ),
           const SizedBox(height: 10), // Réduit l'espacement
-
           // Liste des marques avec boutons radio (avec défilement)
           Expanded(
             child: SingleChildScrollView(
@@ -133,27 +136,28 @@ class _BrandScreenState extends State<BrandScreen> {
                       groupValue: selectedBrand,
                       onChanged: (String? value) {
                         setState(() {
-                          selectedBrand = value; // Met à jour la marque sélectionnée
+                          selectedBrand =
+                              value; // Met à jour la marque sélectionnée
                         });
                       },
-                      activeColor: Colors.red, // Couleur du bouton radio sélectionné
-                      controlAffinity: ListTileControlAffinity.leading, // Bouton radio à gauche
+                      activeColor:
+                          Colors.red, // Couleur du bouton radio sélectionné
+                      controlAffinity:
+                          ListTileControlAffinity
+                              .leading, // Bouton radio à gauche
                     ),
                     // Ajouter une ligne de séparation avec opacité et ombre, sauf après la dernière option
                     if (i < filteredBrands.length - 1)
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0), // Marges horizontales
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                        ), // Marges horizontales
                         child: Container(
                           height: 1, // Hauteur de la ligne
                           decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3), // Faible opacité
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2), // Ombre légère
-                                blurRadius: 4, // Flou de l'ombre
-                                offset: const Offset(0, 2), // Décalage de l'ombre
-                              ),
-                            ],
+                            color: AppColors.grayColor.withOpacity(
+                              0.1,
+                            ), // Faible opacité
                           ),
                         ),
                       ),
@@ -164,7 +168,6 @@ class _BrandScreenState extends State<BrandScreen> {
           ),
 
           const SizedBox(height: 10), // Réduit l'espacement
-
           // Bouton "Appliquer" (centré et moins long)
           Center(
             child: SizedBox(
@@ -172,7 +175,10 @@ class _BrandScreenState extends State<BrandScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   if (selectedBrand != null) {
-                    Navigator.pop(context, selectedBrand); // Renvoyer la marque sélectionnée
+                    Navigator.pop(
+                      context,
+                      selectedBrand,
+                    ); // Renvoyer la marque sélectionnée
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -185,10 +191,7 @@ class _BrandScreenState extends State<BrandScreen> {
                 ),
                 child: const Text(
                   "Appliquer",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

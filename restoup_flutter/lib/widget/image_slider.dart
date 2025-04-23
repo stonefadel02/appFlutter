@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:restoup_flutter/color/color.dart';
 
 class ImageSlider extends StatelessWidget {
   final Function(int) onChange;
   final int currentSlide;
+
   const ImageSlider({
     super.key,
     required this.currentSlide,
@@ -11,42 +13,43 @@ class ImageSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Liste des images pour le carrousel
-    final List<Widget> slides = [
-      Image.asset(
-        "assets/images/carousel1.png",
-        fit: BoxFit.contain, // Affiche l'image en entier
-      ),
-      Image.asset(
-        "assets/images/carousel2.png",
-        fit: BoxFit.contain, // Affiche l'image en entier
-      ),
+    final List<String> imagePaths = [
+      "assets/images/carousel1.png",
+      "assets/images/carousel2.png",
     ];
+
+    final PageController controller = PageController(viewportFraction: 0.9);
 
     return Column(
       children: [
-        // Conteneur pour l'image
         SizedBox(
           height: 220,
           width: double.infinity,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: PageView(
-              scrollDirection: Axis.horizontal,
-              allowImplicitScrolling: true,
-              onPageChanged: onChange,
-              physics: const ClampingScrollPhysics(),
-              children: slides,
-            ),
+          child: PageView.builder(
+            controller: controller,
+            scrollDirection: Axis.horizontal,
+            onPageChanged: onChange,
+            itemCount: imagePaths.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5), // <-- ESPACE ENTRE LES IMAGES
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image.asset(
+                    imagePaths[index],
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              );
+            },
           ),
         ),
-        // Indicateurs en dessous de l'image
         Padding(
-          padding: const EdgeInsets.only(top: 5), // Espacement entre l'image et les indicateurs
+          padding: const EdgeInsets.only(top: 4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              slides.length,
+              imagePaths.length,
               (index) => AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: currentSlide == index ? 15 : 8,
@@ -54,9 +57,9 @@ class ImageSlider extends StatelessWidget {
                 margin: const EdgeInsets.only(right: 3),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: currentSlide == index ? Colors.black : Colors.transparent,
+                  color: currentSlide == index ? AppColors.primaryRed : Colors.transparent,
                   border: Border.all(
-                    color: Colors.black,
+                    color: AppColors.primaryRed,
                   ),
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restoup_flutter/widget/cartScreen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key});
@@ -8,8 +9,8 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  // Variable pour suivre la marque sélectionnée
   String? _selectedBrand;
+  int _quantity = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -21,18 +22,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Titre personnalisé avec flèche de retour
+                // Titre
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
                       onPressed: () {
-                        Navigator.pop(context); // Retour à la page précédente
+                        Navigator.pop(context);
                       },
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.grey,
-                      ),
+                      icon: const Icon(Icons.arrow_back, color: Colors.grey),
                     ),
                     const Text(
                       "Détails produit",
@@ -41,30 +39,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 48), // Espace pour équilibrer la disposition
+                    const SizedBox(width: 48),
                   ],
                 ),
                 const SizedBox(height: 20),
 
-                // Image du produit avec icône de favori en haut à droite
+                // Image + favori
                 Center(
                   child: Stack(
+                    clipBehavior: Clip.none,
                     children: [
                       Container(
                         width: 150,
                         height: 150,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFFFFF5E1), // Beige clair
-                          image: const DecorationImage(
-                            image: AssetImage("assets/images/bananas.png"), // Remplace par le chemin de ton image
+                          color: Color(0xFFFFF5E1),
+                          image: DecorationImage(
+                            image: AssetImage("assets/images/bananas.png"),
                             fit: BoxFit.cover,
                           ),
                         ),
                       ),
                       Positioned(
-                        top: 0,
-                        right: 0,
+                        top: -10,
+                        right: -10,
                         child: IconButton(
                           onPressed: () {},
                           icon: const Icon(
@@ -78,17 +77,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Nom
+                // Nom produit
                 const Text(
                   "Régime de Banane",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
 
-                // Prix et sélecteur de quantité sur la même ligne
+                // Prix + quantité
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -103,24 +99,32 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              if (_quantity > 1) _quantity--;
+                            });
+                          },
                           icon: const Icon(
                             Icons.remove_circle_outline,
-                            color: Colors.red, // Icône en rouge
+                            color: Colors.red,
                           ),
                         ),
-                        const Text(
-                          "02",
-                          style: TextStyle(
+                        Text(
+                          _quantity.toString().padLeft(2, '0'),
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              _quantity++;
+                            });
+                          },
                           icon: const Icon(
                             Icons.add_circle_outline,
-                            color: Colors.red, // Icône en rouge
+                            color: Colors.red,
                           ),
                         ),
                       ],
@@ -132,20 +136,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 // Description
                 const Text(
                   "Description : dolor sit amet consectetur. Facilisi nunc orci tristique et mattis at lobortis. Consequat in penatibus varius aliquet lorem viverra tempor tincidunt molestie. Consectetur.",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 const SizedBox(height: 20),
 
                 // Marques
                 const Text(
                   "Marques",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Wrap(
@@ -161,26 +159,45 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // Bouton "Ajouter panier" avec largeur réduite
+                // Bouton Ajouter panier
+                // Bouton Ajouter panier
                 Center(
                   child: SizedBox(
-                    width: 200, // Largeur réduite
+                    width: 200, // 👈 Ajuste cette valeur si tu veux plus large
                     child: ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.shopping_cart_outlined),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CartScreen()),
+                    );
+                      },
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.only(left: 0, right: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.shopping_cart_outlined,
+                          color: Colors.red,
+                          size: 24,
+                        ),
+                      ),
                       label: const Text(
-                        "Ajouter panier",
+                        "Ajouter au panier",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
@@ -194,7 +211,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  // Widget pour les boutons radio des marques
   Widget _buildBrandChip(String brand) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -207,15 +223,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               _selectedBrand = value;
             });
           },
-          activeColor: Colors.red, // Couleur du bouton radio sélectionné
+          activeColor: Colors.red,
         ),
-        Text(
-          brand,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.grey,
-          ),
-        ),
+        Text(brand, style: const TextStyle(fontSize: 14, color: Colors.grey)),
       ],
     );
   }

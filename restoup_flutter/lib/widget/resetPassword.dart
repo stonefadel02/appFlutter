@@ -42,14 +42,14 @@ class _ResetPasswordState extends State<ResetPassword> {
               children: [
                 // Logo
                 Image.asset('assets/images/logoResto 1.png'),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
 
                 // Texte principal
                 Text(
                   'Récupération de Mot de Passe',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.darkBlue,
                   ),
@@ -61,7 +61,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue.withOpacity(0.5),
+                    color: AppColors.grayColor,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -74,7 +74,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.darkBlue.withOpacity(0.3),
+                      color: AppColors.grayColor,
                     ),
                   ),
                 ),

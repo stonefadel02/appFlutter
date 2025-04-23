@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restoup_flutter/accueil/homeScreen.dart';
 import 'package:restoup_flutter/color/color.dart';
 
 class RegisterSuccess extends StatefulWidget {
@@ -22,13 +23,16 @@ class _RegisterSuccessState extends State<RegisterSuccess> {
   void _showSuccessPopup() {
     showDialog(
       context: context,
-      barrierDismissible: false, // Empêche de fermer le popup en cliquant à l'extérieur
+      barrierDismissible:
+          false, // Empêche de fermer le popup en cliquant à l'extérieur
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           child: Padding(
+            
             padding: const EdgeInsets.all(24.0),
             child: Stack(
               children: [
@@ -36,12 +40,10 @@ class _RegisterSuccessState extends State<RegisterSuccess> {
                 Column(
                   mainAxisSize: MainAxisSize.min, // Ajuste la taille au contenu
                   children: [
-                  const SizedBox(height: 40),
+                    const SizedBox(height: 40),
 
                     // Image (confettis)
-                    Image.asset(
-                      'assets/images/success.png',
-                    ),
+                    Image.asset('assets/images/success.png'),
                     const SizedBox(height: 25),
 
                     // Titre "Félicitation"
@@ -61,7 +63,7 @@ class _RegisterSuccessState extends State<RegisterSuccess> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: AppColors.darkBlue.withOpacity(0.5),
+                        color: AppColors.grayColor,
                       ),
                     ),
                     const SizedBox(height: 28),
@@ -71,17 +73,20 @@ class _RegisterSuccessState extends State<RegisterSuccess> {
                       onPressed: () {
                         // Ferme le popup et redirige vers la page d'accueil
                         Navigator.of(context).pop(); // Ferme le popup
-                        // Navigator.pushReplacement(
-                        //   context,
-                        //   MaterialPageRoute(builder: (context) => const HomePage()),
-                        // );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryRed,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        minimumSize: const Size(150, 50), // Largeur réduite à 150
+                        minimumSize: const Size(
+                          150,
+                          50,
+                        ), // Largeur réduite à 150
                         elevation: 6,
                         shadowColor: AppColors.primaryRed.withOpacity(0.3),
                       ),
@@ -94,8 +99,7 @@ class _RegisterSuccessState extends State<RegisterSuccess> {
                         ),
                       ),
                     ),
-                                        const SizedBox(height: 40),
-
+                    const SizedBox(height: 40),
                   ],
                 ),
 
@@ -107,10 +111,17 @@ class _RegisterSuccessState extends State<RegisterSuccess> {
                     onTap: () {
                       Navigator.of(context).pop(); // Ferme le popup
                     },
-                    child: const Icon(
-                      Icons.close,
-                      color: AppColors.grayColor,
-                      size: 24,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200], // Fond gris pour l'icône
+                        shape: BoxShape.circle, // Forme circulaire
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        color: AppColors.grayColor,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ),
@@ -127,7 +138,8 @@ class _RegisterSuccessState extends State<RegisterSuccess> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: const Center(
-        child: CircularProgressIndicator(), // Affiche un indicateur de chargement pendant que le popup s'ouvre
+        child:
+            CircularProgressIndicator(), // Affiche un indicateur de chargement pendant que le popup s'ouvre
       ),
     );
   }

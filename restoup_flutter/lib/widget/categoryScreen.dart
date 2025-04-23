@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restoup_flutter/color/color.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -23,7 +24,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.7, // Hauteur du BottomSheet (70% de l'écran)
+      height: MediaQuery.of(context).size.height * 0.9, // Hauteur du BottomSheet (70% de l'écran)
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +40,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       Navigator.pop(context); // Ferme le BottomSheet sans sélection
                     },
                     icon: const Icon(
-                      Icons.arrow_back_ios, // Flèche de retour (vers la gauche)
+                      Icons.arrow_back, // Flèche de retour (vers la gauche)
                       color: Colors.grey,
                       size: 20,
                     ),
@@ -72,9 +73,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       });
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                       decoration: BoxDecoration(
-                        color: isSelected ? Colors.red : Colors.grey[200],
+                        color: isSelected ? Colors.red : AppColors.grayColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(

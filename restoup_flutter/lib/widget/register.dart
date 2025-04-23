@@ -11,16 +11,16 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  bool _obscureText = true; // Pour gérer l'affichage/masquage du mot de passe
+  bool _obscureText = true;
   bool _obscureText1 = true;
   bool _rememberMe = false;
-  final TextEditingController _emailController =
-      TextEditingController(); // Contrôleur pour l'email
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Écoute les changements dans le champ email pour mettre à jour l'icône
     _emailController.addListener(() {
       setState(() {});
     });
@@ -28,8 +28,42 @@ class _RegisterState extends State<Register> {
 
   @override
   void dispose() {
-    _emailController.dispose(); // Nettoie le contrôleur
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  // Valider le formulaire
+  void _validateAndProceed() {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez remplir tous les champs')),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Les mots de passe ne correspondent pas')),
+      );
+      return;
+    }
+
+    // Passez à l'écran suivant avec email et mot de passe
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Register2(
+          email: email,
+          password: password,
+        ),
+      ),
+    );
   }
 
   @override
@@ -43,11 +77,8 @@ class _RegisterState extends State<Register> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Logo
                 Image.asset('assets/images/logoResto 1.png'),
                 const SizedBox(height: 40),
-
-                // Texte principal
                 Text(
                   'Hello! Créer un compte',
                   textAlign: TextAlign.center,
@@ -58,12 +89,11 @@ class _RegisterState extends State<Register> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Vous avez déjà un compte? ',
+                      'Vous avez déjà un compte ? ',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -85,44 +115,45 @@ class _RegisterState extends State<Register> {
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 40),
-
-                // Champ Nom d'utilisateur ou Email avec icône conditionnelle
                 TextField(
-                  controller: _emailController, // Ajoute le contrôleur
+                  controller: _emailController,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: AppColors.grayColor.withOpacity(0.1),
-                    labelText: "Addresse e-mail",
+                    fillColor: AppColors.grayColor.withOpacity(0.05),
+                    labelText: 'Adresse e-mail',
                     labelStyle: TextStyle(color: AppColors.grayColor),
-                    border: InputBorder.none,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.2),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.primaryRed),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.4),
+                        width: 1.5,
+                      ),
                     ),
-                    suffixIcon:
-                        _emailController.text.isNotEmpty
-                            ? Icon(
-                              Icons.check_circle, // Icône de validation (coche)
-                              color:
-                                  AppColors
-                                      .grayColor, // Même couleur que le label
-                            )
-                            : null, // Aucune icône si le champ est vide
+                    suffixIcon: _emailController.text.isNotEmpty
+                        ? Icon(
+                            Icons.check_circle,
+                            color: AppColors.grayColor,
+                          )
+                        : null,
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
-
-                // Champ Mot de passe avec icône œil
                 TextField(
+                  controller: _passwordController,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: AppColors.grayColor.withOpacity(0.1),
+                    fillColor: AppColors.grayColor.withOpacity(0.05),
                     labelText: 'Mot de Passe',
                     labelStyle: TextStyle(color: AppColors.grayColor),
                     border: OutlineInputBorder(
@@ -130,10 +161,16 @@ class _RegisterState extends State<Register> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.2),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.primaryRed),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.4),
+                        width: 1.5,
+                      ),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -150,11 +187,11 @@ class _RegisterState extends State<Register> {
                   obscureText: _obscureText,
                 ),
                 const SizedBox(height: 16),
-
                 TextField(
+                  controller: _confirmPasswordController,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: AppColors.grayColor.withOpacity(0.1),
+                    fillColor: AppColors.grayColor.withOpacity(0.05),
                     labelText: 'Confirmer mot de passe',
                     labelStyle: TextStyle(color: AppColors.grayColor),
                     border: OutlineInputBorder(
@@ -162,10 +199,16 @@ class _RegisterState extends State<Register> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.2),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.primaryRed),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.4),
+                        width: 1.5,
+                      ),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -182,20 +225,46 @@ class _RegisterState extends State<Register> {
                   obscureText: _obscureText1,
                 ),
                 const SizedBox(height: 16),
-
+                ElevatedButton(
+                  onPressed: _validateAndProceed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryRed,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    minimumSize: const Size(double.infinity, 50),
+                    elevation: 6,
+                    shadowColor: AppColors.primaryRed.withOpacity(0.3),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Suivant',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
                         Checkbox(
+                          shape: const CircleBorder(),
                           value: _rememberMe,
                           onChanged: (value) {
                             setState(() {
                               _rememberMe = value ?? false;
                             });
                           },
-                          activeColor: AppColors.primaryRed,
+                          activeColor: Colors.black,
                         ),
                         const Text(
                           'Me rappeler',
@@ -227,58 +296,39 @@ class _RegisterState extends State<Register> {
                   ],
                 ),
                 const SizedBox(height: 24),
-
-                // Bouton "Se connecter"
-                ElevatedButton(
-                  onPressed: () {
-                       Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Register2()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryRed,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: AppColors.grayColor.withOpacity(0.3),
+                        thickness: 1,
+                      ),
                     ),
-                    minimumSize: const Size(double.infinity, 50),
-                    elevation: 6,
-                    shadowColor: AppColors.primaryRed.withOpacity(0.3),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'S\'inscrire',
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        'OU',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
                           fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.grayColor,
                         ),
-                      ),                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                const Text(
-                  'Ou',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                  ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: AppColors.grayColor.withOpacity(0.3),
+                        thickness: 1,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-
-                // Boutons sociaux
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Bouton Facebook
                     OutlinedButton.icon(
-                      onPressed: () {
-                        // Logique pour connexion via Facebook
-                      },
+                      onPressed: () {},
                       icon: Image.asset(
                         'assets/images/Facebook.png',
                         width: 24,
@@ -301,12 +351,8 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                     const SizedBox(width: 16),
-
-                    // Bouton Google
                     OutlinedButton.icon(
-                      onPressed: () {
-                     
-                      },
+                      onPressed: () {},
                       icon: Image.asset(
                         'assets/images/Google.png',
                         width: 24,

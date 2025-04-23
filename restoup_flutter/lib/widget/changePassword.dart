@@ -81,7 +81,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                 TextField(
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: AppColors.grayColor.withOpacity(0.1),
+                    fillColor: AppColors.grayColor.withOpacity(0.05),
                     labelText: 'Mot de Passe',
                     labelStyle: TextStyle(color: AppColors.grayColor),
                     border: OutlineInputBorder(
@@ -89,10 +89,16 @@ class _ChangePasswordState extends State<ChangePassword> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.2),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.primaryRed),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.4),
+                        width: 1.5,
+                      ),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -113,7 +119,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                 TextField(
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: AppColors.grayColor.withOpacity(0.1),
+                    fillColor: AppColors.grayColor.withOpacity(0.05),
                     labelText: 'Mot de Passe',
                     labelStyle: TextStyle(color: AppColors.grayColor),
                     border: OutlineInputBorder(
@@ -121,10 +127,16 @@ class _ChangePasswordState extends State<ChangePassword> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.2),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.primaryRed),
+                      borderSide: BorderSide(
+                        color: AppColors.grayColor.withOpacity(0.4),
+                        width: 1.5,
+                      ),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -141,8 +153,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                   obscureText: _obscureText1,
                 ),
                 const SizedBox(height: 24),
-
-               
 
                 // Bouton "Se connecter"
                 ElevatedButton(
@@ -173,22 +183,23 @@ class _ChangePasswordState extends State<ChangePassword> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                 Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Row(
                       children: [
                         Checkbox(
+                          shape: const CircleBorder(),
                           value: _rememberMe,
                           onChanged: (value) {
                             setState(() {
                               _rememberMe = value ?? false;
                             });
                           },
-                          activeColor: AppColors.primaryRed,
+                          activeColor: Colors.black,
                         ),
                         const Text(
-                          'Me Rappeler',
+                          'Me rappeler',
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
@@ -199,7 +210,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                   ],
                 ),
                 const SizedBox(height: 24),
-
               ],
             ),
           ),

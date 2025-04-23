@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Carrousel juste après l'AppBar
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16), // Marges horizontales
+                padding: const EdgeInsets.symmetric(horizontal: 2), // Marges horizontales
                 child: ImageSlider(
                   currentSlide: currentSlide,
                   onChange: onChange,
@@ -61,9 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Products(),
               ),
 
-              // Ajouter un espace supplémentaire pour tester le défilement
-              const SizedBox(height: 500),
-              const Text("Fin de la page"),
             ],
           ),
         ),

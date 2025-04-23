@@ -3,14 +3,51 @@ import 'package:restoup_flutter/color/color.dart';
 import 'package:restoup_flutter/widget/register4.dart';
 
 class Register3 extends StatefulWidget {
-  const Register3({super.key});
+  final String email;
+  final String password;
+  final String contactName;
+  final String contactFirstName;
+  final String siret;
+  final String companyName;
+  final String postalAddress;
+  final String? identityDocumentUrl;
+
+  const Register3({
+    super.key,
+    required this.email,
+    required this.password,
+    required this.contactName,
+    required this.contactFirstName,
+    required this.siret,
+    required this.companyName,
+    required this.postalAddress,
+    this.identityDocumentUrl,
+  });
 
   @override
   State<Register3> createState() => _Register3State();
 }
 
 class _Register3State extends State<Register3> {
-  String? _selectedProfile = 'Restauration Commerciale'; // Profil sélectionné par défaut
+  String? _selectedProfile = 'Restauration Commerciale';
+
+  void _proceedToNext() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Register4(
+          email: widget.email,
+          password: widget.password,
+          contactName: widget.contactName,
+          contactFirstName: widget.contactFirstName,
+          siret: widget.siret,
+          companyName: widget.companyName,
+          postalAddress: widget.postalAddress,
+          identityDocumentUrl: widget.identityDocumentUrl,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +60,8 @@ class _Register3State extends State<Register3> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Logo
                 Image.asset('assets/images/logoResto 1.png'),
                 const SizedBox(height: 40),
-
-                // Texte principal
                 Text(
                   'Quel est votre profil?',
                   textAlign: TextAlign.center,
@@ -38,32 +72,26 @@ class _Register3State extends State<Register3> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
                 Text(
                   'Afin de vous proposer un contenu adapté,',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue.withOpacity(0.5),
+                    color: AppColors.grayColor,
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 Text(
                   'veuillez sélectionner votre profil',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue.withOpacity(0.5),
+                    color: AppColors.grayColor,
                   ),
                 ),
-
                 const SizedBox(height: 40),
-
-                // Liste des options de profil avec RadioListTile
                 Column(
                   children: [
                     _buildProfileOption(
@@ -87,17 +115,9 @@ class _Register3State extends State<Register3> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
-
-                // Bouton "Continuer"
                 ElevatedButton(
-                  onPressed: () {
-                        Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Register4()),);
-                    print('Profil sélectionné : $_selectedProfile');
-                  },
+                  onPressed: _proceedToNext,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryRed,
                     shape: RoundedRectangleBorder(
@@ -125,11 +145,10 @@ class _Register3State extends State<Register3> {
     );
   }
 
-  // Widget pour construire chaque option de profil
   Widget _buildProfileOption({required String title, required String value}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.grayColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: AppColors.grayColor.withOpacity(0.3),
@@ -152,8 +171,8 @@ class _Register3State extends State<Register3> {
             _selectedProfile = newValue;
           });
         },
-        activeColor: AppColors.primaryRed, // Couleur du cercle lorsqu'il est sélectionné
-        controlAffinity: ListTileControlAffinity.trailing, // Déplace le bouton radio à droite
+        activeColor: AppColors.primaryRed,
+        controlAffinity: ListTileControlAffinity.trailing,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       ),
     );

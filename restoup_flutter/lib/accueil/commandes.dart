@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restoup_flutter/accueil/trackingScreen.dart';
+import 'package:restoup_flutter/color/color.dart';
 import 'package:restoup_flutter/widget/cancelPopup.dart';
 import 'package:restoup_flutter/widget/detailsPopup.dart';
 
@@ -86,7 +87,9 @@ class _CommandesState extends State<Commandes> {
   Widget build(BuildContext context) {
     return Scaffold(
       // En-tête
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Text(
           "Mes Commandes",
           style: TextStyle(
@@ -96,6 +99,18 @@ class _CommandesState extends State<Commandes> {
         ),
         centerTitle: true, // Centre le titre
         actions: [
+          // Icône de notification
+          IconButton(
+            onPressed: () {
+              // Action pour ouvrir les notifications (non implémentée pour l'instant)
+            },
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: Colors.black,
+              size: 28,
+            ),
+          ),
+          // Icône de panier
           IconButton(
             onPressed: () {
               // Action pour ouvrir le panier
@@ -116,6 +131,7 @@ class _CommandesState extends State<Commandes> {
         itemBuilder: (context, index) {
           final order = orders[index];
           return Card(
+            color: Colors.white, // Fond blanc pour la carte
             elevation: 2,
             margin: const EdgeInsets.only(bottom: 16.0),
             shape: RoundedRectangleBorder(
@@ -135,7 +151,7 @@ class _CommandesState extends State<Commandes> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: AppColors.grayColor,
                         ),
                       ),
                       Text(
@@ -180,7 +196,7 @@ class _CommandesState extends State<Commandes> {
                         "Temps d’arrivée",
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey,
+                          color: AppColors.grayColor,
                         ),
                       ),
                       GestureDetector(
@@ -261,7 +277,7 @@ class _CommandesState extends State<Commandes> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[200],
+                            backgroundColor: Colors.grey[50],
                             foregroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -303,7 +319,6 @@ class _CommandesState extends State<Commandes> {
                             "Suivi commande",
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),

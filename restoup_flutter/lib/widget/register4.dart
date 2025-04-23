@@ -1,9 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:restoup_flutter/color/color.dart';
+import 'package:restoup_flutter/services/api_service.dart';
 import 'package:restoup_flutter/widget/registerSuccess.dart';
 
 class Register4 extends StatefulWidget {
-  const Register4({super.key});
+  final String email;
+  final String password;
+  final String contactName;
+  final String contactFirstName;
+  final String siret;
+  final String companyName;
+  final String postalAddress;
+  final String? identityDocumentUrl;
+
+  const Register4({
+    super.key,
+    required this.email,
+    required this.password,
+    required this.contactName,
+    required this.contactFirstName,
+    required this.siret,
+    required this.companyName,
+    required this.postalAddress,
+    this.identityDocumentUrl,
+  });
 
   @override
   State<Register4> createState() => _Register4State();
@@ -11,6 +31,8 @@ class Register4 extends StatefulWidget {
 
 class _Register4State extends State<Register4> {
   final TextEditingController _addressController = TextEditingController();
+  final ApiService _apiService = ApiService();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -26,6 +48,52 @@ class _Register4State extends State<Register4> {
     super.dispose();
   }
 
+  Future<void> _submitForm() async {
+    if (_addressController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez entrer une adresse de livraison')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await _apiService.register(
+        email: widget.email,
+        password: widget.password,
+        companyName: widget.companyName,
+        contactName: widget.contactName,
+        contactFirstName: widget.contactFirstName,
+        siret: widget.siret,
+        postalAddress: widget.postalAddress,
+        identityDocumentUrl: widget.identityDocumentUrl,
+        deliveryAddress: _addressController.text.trim(),
+      );
+
+      if (response['error'] == null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const RegisterSuccess()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: ${response['error']}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de l\'inscription: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,51 +105,41 @@ class _Register4State extends State<Register4> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Logo
                 Image.asset('assets/images/logoResto 1.png'),
                 const SizedBox(height: 40),
-
-                // Texte principal
                 Text(
-                  'Où allons-nous vous livrer?',
+                  'Où allons-nous vous livrer ?',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
                     color: AppColors.darkBlue,
                   ),
                 ),
                 const SizedBox(height: 8),
-
                 Text(
                   'Afin de vous livrer à la bonne adresse, veuillez',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue.withOpacity(0.5),
+                    color: AppColors.grayColor,
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 Text(
                   'entrer votre localisation.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue.withOpacity(0.5),
+                    color: AppColors.grayColor,
                   ),
                 ),
-
                 const SizedBox(height: 40),
-
-                // Champ "Adresse"
                 Focus(
                   onFocusChange: (hasFocus) {
-                    setState(() {
-                    });
+                    setState(() {});
                   },
                   child: TextField(
                     controller: _addressController,
@@ -89,18 +147,21 @@ class _Register4State extends State<Register4> {
                       filled: true,
                       fillColor: AppColors.grayColor.withOpacity(0.1),
                       hintText: "Adresse",
-                      hintStyle: TextStyle(color: AppColors.grayColor),
-                      border: InputBorder.none,
+                      labelStyle: TextStyle(color: AppColors.grayColor),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: AppColors.grayColor.withOpacity(0.3),
+                          color: AppColors.grayColor.withOpacity(0.2),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(
-                          color: AppColors.primaryRed,
+                        borderSide: BorderSide(
+                          color: AppColors.grayColor.withOpacity(0.4),
+                          width: 1.5,
                         ),
                       ),
                       suffixIcon: Icon(
@@ -111,18 +172,9 @@ class _Register4State extends State<Register4> {
                     keyboardType: TextInputType.streetAddress,
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
-                // Bouton "Continuer"
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RegisterSuccess()),
-                    );
-                    print('Adresse entrée : ${_addressController.text}');
-                  },
+                  onPressed: _isLoading ? null : _submitForm,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryRed,
                     shape: RoundedRectangleBorder(
@@ -132,14 +184,16 @@ class _Register4State extends State<Register4> {
                     elevation: 6,
                     shadowColor: AppColors.primaryRed.withOpacity(0.3),
                   ),
-                  child: const Text(
-                    'Continuer',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'Continuer',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 24),
               ],

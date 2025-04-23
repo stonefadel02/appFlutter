@@ -74,7 +74,7 @@ class _NumberVerificationState extends State<NumberVerification> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue.withOpacity(0.5),
+                    color: AppColors.grayColor,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -84,7 +84,7 @@ class _NumberVerificationState extends State<NumberVerification> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue.withOpacity(0.5),
+                    color: AppColors.grayColor,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -110,7 +110,7 @@ class _NumberVerificationState extends State<NumberVerification> {
                         decoration: InputDecoration(
                           counterText: '', // Masquer le compteur de caractères
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: AppColors.grayColor.withOpacity(0.1),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: BorderSide(
@@ -185,7 +185,7 @@ class _NumberVerificationState extends State<NumberVerification> {
                   width: double.infinity, // Pleine largeur comme le bouton
                   height: 50, // Même hauteur que le bouton
                   decoration: BoxDecoration(
-                    color: AppColors.grayColor.withOpacity(0.3), // Fond gris
+                    color: AppColors.grayColor.withOpacity(0.1), // Fond gris
                     borderRadius: BorderRadius.circular(
                       12,
                     ), // Même borderRadius que le bouton

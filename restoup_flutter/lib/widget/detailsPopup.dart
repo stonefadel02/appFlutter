@@ -8,6 +8,7 @@ class OrderDetailsPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -28,14 +29,22 @@ class OrderDetailsPopup extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Ferme le popup
-                  },
-                  icon: const Icon(
-                    Icons.close,
-                    color: Colors.grey,
-                    size: 24,
+                // Icône de fermeture avec fond gris
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200], // Fond gris
+                    shape: BoxShape.circle, // Forme circulaire
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Ferme le popup
+                    },
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
+                    padding: EdgeInsets.zero, // Supprime le padding par défaut de l'IconButton
                   ),
                 ),
               ],
@@ -46,28 +55,53 @@ class OrderDetailsPopup extends StatelessWidget {
             for (var product in products) ...[
               Row(
                 children: [
-                  // Image du produit (simulée avec un cercle jaune pour les bananes)
+                  // Image réelle du produit
                   Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.yellow, // Simulation d'une image de bananes
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20), // Coins arrondis pour l'image
+                    ),
+                    child: Image.asset(
+                      'assets/images/product.png', // Remplace par le chemin de ton image
+                      fit: BoxFit.cover, // Ajuste l'image pour remplir le conteneur
                     ),
                   ),
                   const SizedBox(width: 10),
-                  // Nom, quantité, prix et poids
+                  // Nom, "Maggi", quantité, prix et poids
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          product['name'], // Nom avec la marque (par exemple, "Régime de banane Maggi")
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              product['name'].split(' ')[0], // "Régime" (partie avant "de")
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            
+                            const SizedBox(width: 4),
+                            Text(
+                              product['name'].split(' ').sublist(1).join(' '), // "de banane" (partie après "de")
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(width: 4),
+                            const Text(
+                              "Maggi", // "Maggi" comme élément séparé
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
                         Row(
                           children: [
                             // Badge orange pour la quantité

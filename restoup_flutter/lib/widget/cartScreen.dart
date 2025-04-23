@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restoup_flutter/color/color.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -8,33 +9,36 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  // Liste des produits dans le panier avec leur quantité
   final List<Map<String, dynamic>> _cartItems = [
     {
       "name": "Régime de Banane",
       "brand": "Maggi",
       "price": 15.30,
       "quantity": 2,
-      "image": "assets/images/bananas.png",
+      "image": "assets/images/product.png",
     },
     {
       "name": "Feuille de laitue",
       "brand": "Maggi",
       "price": 12.00,
       "quantity": 2,
-      "image": "assets/images/lettuce.png",
+      "image": "assets/images/product.png",
     },
   ];
 
-  // Calculer le total initial
   double get _totalInitial {
-    return _cartItems.fold(0, (sum, item) => sum + (item["price"] * item["quantity"]));
+    return _cartItems.fold(
+      0,
+      (sum, item) => sum + (item["price"] * item["quantity"]),
+    );
   }
 
-  // Coût de livraison
+  int get _totalProducts {
+    return _cartItems.fold(0, (int sum, item) => sum + (item["quantity"] as int));
+  }
+
   final double _deliveryCost = 1.00;
 
-  // Total final
   double get _total {
     return _totalInitial + _deliveryCost;
   }
@@ -49,18 +53,15 @@ class _CartScreenState extends State<CartScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Titre personnalisé avec flèche de retour
+                // Titre avec flèche de retour
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
                       onPressed: () {
-                        Navigator.pop(context); // Retour à la page précédente
+                        Navigator.pop(context);
                       },
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.grey,
-                      ),
+                      icon: const Icon(Icons.arrow_back, color: Colors.grey),
                     ),
                     const Text(
                       "Mon panier",
@@ -69,7 +70,7 @@ class _CartScreenState extends State<CartScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 48), // Espace pour équilibrer la disposition
+                    const SizedBox(width: 48),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -83,34 +84,38 @@ class _CartScreenState extends State<CartScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Image du produit
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: AssetImage(item["image"]),
-                              fit: BoxFit.cover,
+                        Flexible(
+                          flex: 2,
+                          child: Container(
+                            width: double.infinity,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              image: DecorationImage(
+                                image: AssetImage(item["image"]),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
-
-                        // Détails du produit
+                        const SizedBox(width: 12),
                         Expanded(
+                          flex: 4,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Nom et icône de suppression sur la même ligne
+                              // Nom + bouton supprimer
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    item["name"],
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                  Expanded(
+                                    child: Text(
+                                      item["name"],
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                   IconButton(
@@ -121,29 +126,26 @@ class _CartScreenState extends State<CartScreen> {
                                     },
                                     icon: const Icon(
                                       Icons.close,
-                                      color: Colors.grey,
+                                      color: AppColors.primaryRed,
                                     ),
                                   ),
                                 ],
                               ),
-
-                              // Marque
                               Text(
                                 item["brand"],
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey,
+                                  color: AppColors.grayColor,
                                 ),
                               ),
-
-                              // Prix et sélecteur de quantité sur la même ligne
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "€${item["price"].toStringAsFixed(2)}/kg",
                                     style: const TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 18,
                                       color: Colors.red,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -164,10 +166,13 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ),
                                       Text(
-                                        item["quantity"].toString().padLeft(2, '0'),
+                                        item["quantity"]
+                                            .toString()
+                                            .padLeft(2, '0'),
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
+                                          color: AppColors.grayColor,
                                         ),
                                       ),
                                       IconButton(
@@ -216,6 +221,9 @@ class _CartScreenState extends State<CartScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
+                Divider(color: Colors.grey.withOpacity(0.1), thickness: 1),
+                const SizedBox(height: 10),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -236,12 +244,15 @@ class _CartScreenState extends State<CartScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
+                Divider(color: Colors.grey.withOpacity(0.1), thickness: 1),
+                const SizedBox(height: 10),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Total",
-                      style: TextStyle(
+                    Text(
+                      "Total ($_totalProducts produit${_totalProducts > 1 ? 's' : ''})",
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -255,28 +266,48 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 30),
 
-                // Bouton "Passez au paiement"
+                // Bouton paiement
+                 // Bouton Ajouter panier
                 Center(
                   child: SizedBox(
-                    width: 200,
+                    width: 200, // 👈 Ajuste cette valeur si tu veux plus large
                     child: ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.shopping_cart_outlined),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CartScreen()),
+                    );
+                      },
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.only(left: 0, right: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.shopping_cart_outlined,
+                          color: Colors.red,
+                          size: 24,
+                        ),
+                      ),
                       label: const Text(
                         "Passez au paiement",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),

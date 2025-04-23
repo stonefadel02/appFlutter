@@ -7,6 +7,7 @@ class CompletionPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -32,31 +33,42 @@ class CompletionPopup extends StatelessWidget {
               ],
             ),
 
-            // Icône de célébration (confettis)
-            const Icon(
-              Icons.celebration, // Utiliser une icône de célébration
-              size: 50,
-              color: Colors.orange, // Couleur proche de la maquette
+            // Image de célébration (remplace l'icône)
+            Image.asset(
+              'assets/images/confetti.png', // Remplace par le chemin de ton image
+              height: 50, // Ajuste la hauteur pour correspondre à l'icône précédente
+              width: 50,
+              fit: BoxFit.cover, // Ajuste l'image pour remplir l'espace
             ),
             const SizedBox(height: 16),
 
-            // Titre "Félicitation"
+            // Titre "Félicitation" en rouge
             const Text(
               "Félicitation",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
+                color: Colors.red,
               ),
             ),
             const SizedBox(height: 16),
 
-            // Description
+            // Description avec "Vous serez livrés" en gras
             const Text(
-              "Votre commande a été livrée avec succès.\nVous serez livrés dès le lendemain !",
+              "Votre commande a été livrée avec succès.\n",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
+              ),
+            ),
+            const Text(
+              "Vous serez livrés dès le lendemain !",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+                fontWeight: FontWeight.bold, // "Vous serez livrés" en gras
               ),
             ),
             const SizedBox(height: 24),
