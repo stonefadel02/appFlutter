@@ -40,6 +40,23 @@ android {
     }
 }
 
+dependencies {
+    // Ajouter la dépendance AppCompat pour Theme.AppCompat
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    // Ajouter la dépendance Material Components (optionnel, si tu veux utiliser Theme.MaterialComponents)
+    implementation 'com.google.android.material:material:1.12.0'
+    // Dépendances déjà ajoutées dans une réponse précédente
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.10'
+    constraints {
+        implementation('androidx.constraintlayout:constraintlayout') {
+            version {
+                strictly '2.1.4'
+            }
+        }
+    }
+}
+
 flutter {
     source = "../.."
 }

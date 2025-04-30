@@ -1,41 +1,48 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:restoup_flutter/color/color.dart';
 import 'package:restoup_flutter/services/api_service.dart';
-import 'package:restoup_flutter/widget/registerSuccess.dart';
 
-class Register4 extends StatefulWidget {
-  final String email;
-  final String password;
-  final String contactName;
-  final String contactFirstName;
-  final String siret;
-  final String companyName;
-  final String postalAddress;
-  final File? selectedFile; // Recevoir le fichier
-
-  const Register4({
-    super.key,
-    required this.email,
-    required this.password,
-    required this.contactName,
-    required this.contactFirstName,
-    required this.siret,
-    required this.companyName,
-    required this.postalAddress,
-    this.selectedFile,
-  });
+class EditAddressScreen extends StatefulWidget {
+  const EditAddressScreen({super.key});
 
   @override
-  State<Register4> createState() => _Register4State();
+  State<EditAddressScreen> createState() => _EditAddressScreenState();
 }
 
-class _Register4State extends State<Register4> {
-  final TextEditingController _addressController = TextEditingController();
+class _EditAddressScreenState extends State<EditAddressScreen> {
   final ApiService _apiService = ApiService();
+  final TextEditingController _addressController = TextEditingController();
   bool _isLoading = false;
+  Map<String, dynamic>? _profileData;
 
-  Future<void> _submitForm() async {
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final response = await _apiService.getProfile();
+      setState(() {
+        _profileData = response['data'];
+        _addressController.text = _profileData?['deliveryAddress'] ?? '';
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors du chargement de l\'adresse: $e')),
+      );
+    }
+  }
+
+  Future<void> _saveAddress() async {
     if (_addressController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Veuillez entrer une adresse de livraison')),
@@ -48,44 +55,24 @@ class _Register4State extends State<Register4> {
     });
 
     try {
-      // Afficher les données qui seront envoyées au backend
-      print('Données envoyées au backend :');
-      print('Email: ${widget.email}');
-      print('Password: ${widget.password}');
-      print('Company Name: ${widget.companyName}');
-      print('Contact Name: ${widget.contactName}');
-      print('Contact First Name: ${widget.contactFirstName}');
-      print('SIRET: ${widget.siret}');
-      print('Postal Address: ${widget.postalAddress}');
-      print('Delivery Address: ${_addressController.text.trim()}');
-      print('Fichier sélectionné: ${widget.selectedFile != null ? widget.selectedFile!.path : "Aucun fichier"}');
-
-      final response = await _apiService.register(
-        email: widget.email,
-        password: widget.password,
-        companyName: widget.companyName,
-        contactName: widget.contactName,
-        contactFirstName: widget.contactFirstName,
-        siret: widget.siret,
-        postalAddress: widget.postalAddress,
-        identityDocumentFile: widget.selectedFile, // Envoyer le fichier
+      final response = await _apiService.updateProfile(
         deliveryAddress: _addressController.text.trim(),
       );
 
       if (response['error'] == null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const RegisterSuccess()),
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Adresse mise à jour avec succès')),
         );
+        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erreur: ${response['error']}')),
         );
       }
     } catch (e) {
-      print('Erreur lors de l\'inscription: $e');
+      print('Erreur lors de la mise à jour de l\'adresse: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de l\'inscription: $e')),
+        SnackBar(content: Text('Erreur lors de la mise à jour: $e')),
       );
     } finally {
       setState(() {
@@ -102,37 +89,58 @@ class _Register4State extends State<Register4> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.white, // Fond blanc pour l'écran de chargement
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white, // Fond blanc pour toute la page
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset('assets/images/logoResto 1.png'),
-                const SizedBox(height: 40),
-                Text(
-                  'Adresse de livraison',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue,
-                  ),
+                // Titre personnalisé avec flèche de retour
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const Text(
+                      "Modifier l'Adresse",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 48),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Entrez votre adresse de livraison',
-                  textAlign: TextAlign.center,
+                const SizedBox(height: 20),
+
+                // Sous-titre
+                const Text(
+                  "Mettez à jour votre adresse de livraison",
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.darkBlue.withOpacity(0.5),
+                    color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
+
+                // Champ pour l'adresse de livraison
                 TextField(
                   controller: _addressController,
                   decoration: InputDecoration(
@@ -158,15 +166,17 @@ class _Register4State extends State<Register4> {
                     ),
                     suffixIcon: _addressController.text.isNotEmpty
                         ? Icon(
-                            Icons.check_circle,
+                            Icons.location_on, // Remplacé par une icône de localisation
                             color: AppColors.grayColor,
                           )
                         : null,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 40),
+
+                // Bouton "Sauvegarder" (pleine largeur)
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _submitForm,
+                  onPressed: _isLoading ? null : _saveAddress,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryRed,
                     shape: RoundedRectangleBorder(
@@ -182,7 +192,7 @@ class _Register4State extends State<Register4> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Terminer',
+                              'Sauvegarder',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,

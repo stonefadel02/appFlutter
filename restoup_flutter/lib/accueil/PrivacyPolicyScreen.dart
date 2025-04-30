@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restoup_flutter/color/color.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -44,6 +45,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: AppColors.primaryRed
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -62,6 +64,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                       color: AppColors.primaryRed
                   ),
                 ),
                 const SizedBox(height: 10),

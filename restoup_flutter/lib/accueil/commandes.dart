@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:restoup_flutter/accueil/favoris.dart';
+import 'package:restoup_flutter/accueil/homeScreen.dart';
+import 'package:restoup_flutter/accueil/notificationScreen.dart';
 import 'package:restoup_flutter/accueil/trackingScreen.dart';
 import 'package:restoup_flutter/color/color.dart';
 import 'package:restoup_flutter/widget/cancelPopup.dart';
 import 'package:restoup_flutter/widget/detailsPopup.dart';
+import 'package:restoup_flutter/services/api_service.dart';
+import 'package:restoup_flutter/widget/cartScreen.dart';
+import 'package:restoup_flutter/widget/cart_manager.dart';
 
 class Commandes extends StatefulWidget {
   const Commandes({super.key});
@@ -12,69 +18,64 @@ class Commandes extends StatefulWidget {
 }
 
 class _CommandesState extends State<Commandes> {
-  // Liste fictive des commandes pour l'exemple, avec une liste de produits
-  List<Map<String, dynamic>> orders = [
-    {
-      'amount': '€33,60',
-      'date': '12/04/2025',
-      'time': 'à 14H03',
-      'deliveryTime': '25 min',
-      'productCount': '2 Produits commandés',
-      'products': [
-        {
-          'name': 'Régime de banane Maggi',
-          'quantity': '2',
-          'price': '€16',
-          'weight': '30g',
-        },
-        {
-          'name': 'Régime de banane Maggi',
-          'quantity': '2',
-          'price': '€16',
-          'weight': '30g',
-        },
-      ],
-    },
-    {
-      'amount': '€33,60',
-      'date': '12/04/2025',
-      'time': 'à 14H03',
-      'deliveryTime': '25 min',
-      'productCount': '2 Produits commandés',
-      'products': [
-        {
-          'name': 'Régime de banane Maggi',
-          'quantity': '2',
-          'price': '€16',
-          'weight': '30g',
-        },
-        {
-          'name': 'Régime de banane Maggi',
-          'quantity': '2',
-          'price': '€16',
-          'weight': '30g',
-        },
-      ],
-    },
-  ];
-
-  // Variable pour gérer l'état du soulignement de "Détail" pour chaque commande
+  List<Map<String, dynamic>> orders = [];
   List<bool> isDetailPressedList = [];
+  bool _isLoading = true;
+  String? _error;
+  int _cartItemCount = 0;
+
+  final ApiService apiService = ApiService();
+  final CartManager _cartManager = CartManager();
 
   @override
   void initState() {
     super.initState();
-    // Initialiser la liste des états de soulignement (une pour chaque commande)
-    isDetailPressedList = List<bool>.filled(orders.length, false);
+    _loadOrders();
+    _loadCartItemCount();
   }
 
-  // Fonction pour annuler une commande
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadOrders(); // Recharger les commandes chaque fois que l'écran devient visible
+    _loadCartItemCount();
+  }
+
+  Future<void> _loadOrders() async {
+    try {
+      final response = await apiService.getOrders(
+        page: 1,
+        limit: 20,
+      );
+      setState(() {
+        orders = List<Map<String, dynamic>>.from(response['data']['orders'] ?? []);
+        isDetailPressedList = List<bool>.filled(orders.length, false);
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadCartItemCount() async {
+    try {
+      final count = await _cartManager.getCartItemCount();
+      setState(() {
+        _cartItemCount = count;
+      });
+    } catch (e) {
+      print('Erreur lors du chargement du nombre d\'articles dans le panier: $e');
+    }
+  }
+
   void _cancelOrder(int index, String reason) {
     setState(() {
-      orders.removeAt(index); // Supprime la commande de la liste
-      isDetailPressedList.removeAt(index); // Met à jour la liste des états de soulignement
+      orders.removeAt(index);
+      isDetailPressedList.removeAt(index);
     });
-    // Affiche une confirmation (facultatif)
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Commande annulée avec succès. Raison : $reason"),
@@ -83,10 +84,33 @@ class _CommandesState extends State<Commandes> {
     );
   }
 
+  String _formatDate(String dateTime) {
+    final date = DateTime.parse(dateTime);
+    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+  }
+
+  String _formatTime(String dateTime) {
+    final date = DateTime.parse(dateTime);
+    return "à ${date.hour.toString().padLeft(2, '0')}H${date.minute.toString().padLeft(2, '0')}";
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_error != null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: Text('Erreur : $_error')),
+      );
+    }
+
     return Scaffold(
-      // En-tête
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -97,12 +121,14 @@ class _CommandesState extends State<Commandes> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true, // Centre le titre
+        centerTitle: true,
         actions: [
-          // Icône de notification
           IconButton(
             onPressed: () {
-              // Action pour ouvrir les notifications (non implémentée pour l'instant)
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NotificationScreen()),
+              );
             },
             icon: const Icon(
               Icons.notifications_outlined,
@@ -110,231 +136,248 @@ class _CommandesState extends State<Commandes> {
               size: 28,
             ),
           ),
-          // Icône de panier
-          IconButton(
-            onPressed: () {
-              // Action pour ouvrir le panier
-            },
-            icon: const Icon(
-              Icons.shopping_cart_outlined,
-              color: Colors.black,
-              size: 28,
-            ),
+          Stack(
+            children: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CartScreen()),
+                  );
+                },
+                icon: const Icon(
+                  Icons.shopping_cart_outlined,
+                  color: Colors.black,
+                  size: 28,
+                ),
+              ),
+              if (_cartItemCount > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '$_cartItemCount',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
-
-      // Corps de la page (liste des commandes)
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: orders.length,
-        itemBuilder: (context, index) {
-          final order = orders[index];
-          return Card(
-            color: Colors.white, // Fond blanc pour la carte
-            elevation: 2,
-            margin: const EdgeInsets.only(bottom: 16.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Padding(
+      body: orders.isEmpty
+          ? const Center(child: Text('Aucune commande trouvée.'))
+          : ListView.builder(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Ligne 1 : "Montant de la commande" et Date
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Montant de la commande",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.grayColor,
-                        ),
-                      ),
-                      Text(
-                        order['date'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
+              itemCount: orders.length,
+              itemBuilder: (context, index) {
+                final order = orders[index];
+                return Card(
+                  color: Colors.white,
+                  elevation: 2,
+                  margin: const EdgeInsets.only(bottom: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(height: 4),
-
-                  // Ligne 2 : Montant en chiffres et Heure
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        order['amount'],
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        order['time'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Ligne 3 : "Temps d’arrivée" et "Détail"
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Temps d’arrivée",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.grayColor,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTapDown: (_) {
-                          setState(() {
-                            isDetailPressedList[index] = true; // Activer le soulignement
-                          });
-                        },
-                        onTapUp: (_) {
-                          setState(() {
-                            isDetailPressedList[index] = false; // Désactiver le soulignement
-                          });
-                          // Ouvre le popup avec les détails des produits
-                          showDialog(
-                            context: context,
-                            builder: (context) => OrderDetailsPopup(
-                              products: order['products'],
-                            ),
-                          );
-                        },
-                        onTapCancel: () {
-                          setState(() {
-                            isDetailPressedList[index] = false; // Désactiver le soulignement
-                          });
-                        },
-                        child: Text(
-                          "Détail",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.red,
-                            decoration: isDetailPressedList[index]
-                                ? TextDecoration.underline
-                                : TextDecoration.none,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Ligne 4 : Nombre de minutes et "2 Produits commandés"
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        order['deliveryTime'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Text(
-                        order['productCount'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Ligne 5 : Boutons "Annuler" et "Suivi commande"
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Ouvre le popup pour demander la raison de l'annulation
-                            showDialog(
-                              context: context,
-                              builder: (context) => CancelReasonPopup(
-                                onSubmit: (reason) {
-                                  _cancelOrder(index, reason); // Annule la commande
-                                },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Montant de la commande",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.grayColor,
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[50],
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ),
-                          child: const Text(
-                            "Annuler",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              _formatDate(order['createdAt']),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Naviguer vers la page de suivi de commande
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const OrderTrackingScreen(
-                                  trackingSteps: null,
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "€${order['totalPrice'].toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              _formatTime(order['createdAt']),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Temps d’arrivée",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.grayColor,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTapDown: (_) {
+                                setState(() {
+                                  isDetailPressedList[index] = true;
+                                });
+                              },
+                              onTapUp: (_) {
+                                setState(() {
+                                  isDetailPressedList[index] = false;
+                                });
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => OrderDetailsPopup(
+                                    orderId: order['id'],
+                                  ),
+                                );
+                              },
+                              onTapCancel: () {
+                                setState(() {
+                                  isDetailPressedList[index] = false;
+                                });
+                              },
+                              child: Text(
+                                "Détail",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.red,
+                                  decoration: isDetailPressedList[index]
+                                      ? TextDecoration.underline
+                                      : TextDecoration.none,
                                 ),
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ),
-                          child: const Text(
-                            "Suivi commande",
-                            style: TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              order['estimatedDeliveryTime']?.toString() ?? '25 min',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              "${order['orderItemsCount'] ?? 0} Produit${(order['orderItemsCount'] ?? 0) > 1 ? 's' : ''} commandé${(order['orderItemsCount'] ?? 0) > 1 ? 's' : ''}",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => CancelReasonPopup(
+                                      onSubmit: (reason) {
+                                        _cancelOrder(index, reason);
+                                      },
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.grey[50],
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Annuler",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const OrderTrackingScreen(
+                                        trackingSteps: null,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Suivi commande",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
-
-      // Barre de navigation inférieure (inchangée)
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, // "Commandes" est sélectionné
+        currentIndex: 1,
         selectedItemColor: Colors.red,
         unselectedItemColor: Colors.grey,
         showUnselectedLabels: true,
@@ -353,11 +396,16 @@ class _CommandesState extends State<Commandes> {
           ),
         ],
         onTap: (index) {
-          // Gérer la navigation entre les pages
           if (index == 0) {
-            // Naviguer vers la page d'accueil
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
           } else if (index == 2) {
-            // Naviguer vers la page des favoris
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const Favoris()),
+            );
           }
         },
       ),

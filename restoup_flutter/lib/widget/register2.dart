@@ -1,12 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'package:minio/io.dart';
 import 'package:restoup_flutter/color/color.dart';
 import 'package:restoup_flutter/widget/register3.dart';
-import 'package:flutter_file_dialog/flutter_file_dialog.dart';
-import 'package:minio/minio.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Register2 extends StatefulWidget {
   final String email;
@@ -20,106 +16,38 @@ class Register2 extends StatefulWidget {
 
 class _Register2State extends State<Register2> {
   String? _selectedFileName;
-  String? _identityDocumentUrl;
+  File? _selectedFile; // Stocker le fichier sélectionné
   final TextEditingController _contactNameController = TextEditingController();
   final TextEditingController _contactFirstNameController = TextEditingController();
   final TextEditingController _siretController = TextEditingController();
   final TextEditingController _companyNameController = TextEditingController();
   final TextEditingController _postalAddressController = TextEditingController();
   bool _isLoading = false;
+  final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickFile() async {
-    final params = OpenFileDialogParams(
-      dialogType: OpenFileDialogType.document,
-      sourceType: SourceType.photoLibrary,
-      allowEditing: false,
-    );
-
-    final filePath = await FlutterFileDialog.pickFile(params: params);
-
-    if (filePath != null) {
-      final file = File(filePath);
-      setState(() {
-        _selectedFileName = file.path.split('/').last;
-      });
-      await _uploadFile(file);
+    try {
+      // Sélectionner un fichier depuis la galerie
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        final file = File(pickedFile.path);
+        setState(() {
+          _selectedFileName = file.path.split('/').last;
+          _selectedFile = file; // Stocker le fichier
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Aucun fichier sélectionné')),
+        );
+      }
+    } catch (e) {
+      print('Erreur lors de la sélection du fichier: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur lors de la sélection: $e')),
+      );
     }
   }
 
-  // Méthode pour uploader le fichier vers DigitalOcean Spaces
-
-
-Future<void> _uploadFile(File file) async {
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    // Récupération des variables d'environnement
-    final accessKey = dotenv.env['AWS_ACCESS_KEY_ID'];
-    final secretKey = dotenv.env['AWS_SECRET_ACCESS_KEY'];
-    final endpoint = dotenv.env['S3_ENDPOINT'];
-    final cdnUrl = dotenv.env['S3_CDN_URL'];
-    
-    if (accessKey == null || secretKey == null || endpoint == null || cdnUrl == null) {
-      throw Exception('Variables d\'environnement manquantes');
-    }
-
-    final bucketName = 'ipcm-bucket'; // Remplacer par votre nom de bucket
-    final fileName = '${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
-    final objectName = 'uploads/$fileName';
-
-    // Lire le fichier comme bytes
-    final fileBytes = await file.readAsBytes();
-    final contentType = 'image/jpeg'; // Ajuster selon le type de fichier
-    
-    // Créer une requête PUT directe vers S3
-    final uri = Uri.parse('https://$bucketName.$endpoint/$objectName');
-    
-    print('Envoi de la requête d\'upload à $uri');
-    
-    // Créer la requête
-    final request = http.Request('PUT', uri);
-    request.headers['Content-Type'] = contentType;
-    request.headers['x-amz-acl'] = 'public-read';
-    
-    // Ajouter l'autorisation basique
-    final authString = 'AWS $accessKey:$secretKey';
-    request.headers['Authorization'] = authString;
-    
-    // Ajouter le corps de la requête
-    request.bodyBytes = fileBytes;
-    
-    // Envoyer la requête
-    final httpClient = http.Client();
-    final streamedResponse = await httpClient.send(request);
-    
-    print('Code de statut: ${streamedResponse.statusCode}');
-    final responseBody = await streamedResponse.stream.bytesToString();
-    print('Réponse: $responseBody');
-    
-    if (streamedResponse.statusCode == 200) {
-      setState(() {
-        _identityDocumentUrl = '$cdnUrl/$objectName';
-      });
-      print('Upload réussi: $_identityDocumentUrl');
-    } else {
-      throw Exception('Erreur lors de l\'upload du fichier: ${streamedResponse.statusCode} - $responseBody');
-    }
-    
-  } catch (e) {
-    print('Erreur lors de l\'upload: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erreur lors de l\'upload: $e')),
-    );
-  } finally {
-    setState(() {
-      _isLoading = false;
-    });
-  }
-}
-
-  // Valider et passer à l'écran suivant
   void _validateAndProceed() {
     if (_contactNameController.text.isEmpty ||
         _contactFirstNameController.text.isEmpty ||
@@ -143,7 +71,7 @@ Future<void> _uploadFile(File file) async {
           siret: _siretController.text.trim(),
           companyName: _companyNameController.text.trim(),
           postalAddress: _postalAddressController.text.trim(),
-          identityDocumentUrl: _identityDocumentUrl,
+          selectedFile: _selectedFile, // Passer le fichier à Register3
         ),
       ),
     );

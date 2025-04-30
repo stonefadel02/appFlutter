@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  smooth_page_indicator: ^1.2.1 # Ajouté ici avec une version (ajuste selon besoin)
+  smooth_page_indicator: ^1.2.1
   flutter_svg: ^2.0.17
   country_code_picker: ^3.3.0
   water_drop_nav_bar: ^2.2.2
@@ -20,13 +20,11 @@ dependencies:
   flutter_file_dialog: ^3.0.2
   flutter_dotenv: ^5.1.0
   minio: ^3.5.0
-  
-  
-
-  # file_picker: ^10.1.2
-  # google_fonts: ^6.2.1
-  # ionicons: ^0.2.2
-  # file_picker: ^10.1.0
+  shared_preferences: ^2.5.3
+  image_picker: ^1.1.2
+  path_provider: ^2.1.5
+  crypto: ^3.0.5
+  flutter_stripe: '>=11.5.0 <12.0.0'  # Intervalle pour flutter_stripe
 
 dev_dependencies:
   flutter_test:
@@ -39,16 +37,3 @@ flutter:
   assets:
     - assets/images/  
     - .env
-
-
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro # Corrigé : placé au bon niveau d'indentation
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700

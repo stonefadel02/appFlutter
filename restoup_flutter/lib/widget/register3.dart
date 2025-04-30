@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:restoup_flutter/color/color.dart';
 import 'package:restoup_flutter/widget/register4.dart';
@@ -10,7 +11,7 @@ class Register3 extends StatefulWidget {
   final String siret;
   final String companyName;
   final String postalAddress;
-  final String? identityDocumentUrl;
+  final File? selectedFile; // Recevoir le fichier
 
   const Register3({
     super.key,
@@ -21,7 +22,7 @@ class Register3 extends StatefulWidget {
     required this.siret,
     required this.companyName,
     required this.postalAddress,
-    this.identityDocumentUrl,
+    this.selectedFile, // Peut être null
   });
 
   @override
@@ -43,7 +44,7 @@ class _Register3State extends State<Register3> {
           siret: widget.siret,
           companyName: widget.companyName,
           postalAddress: widget.postalAddress,
-          identityDocumentUrl: widget.identityDocumentUrl,
+          selectedFile: widget.selectedFile, // Passer le fichier à Register4
         ),
       ),
     );
@@ -127,13 +128,18 @@ class _Register3State extends State<Register3> {
                     elevation: 6,
                     shadowColor: AppColors.primaryRed.withOpacity(0.3),
                   ),
-                  child: const Text(
-                    'Continuer',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Suivant',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
